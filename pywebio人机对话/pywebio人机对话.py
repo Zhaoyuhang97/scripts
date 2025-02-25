@@ -6,6 +6,7 @@ from pywebio.pin import *
 from pywebio.pin import _pin_output
 from pywebio.utils import check_dom_name_value
 from pywebio import start_server
+from openai import OpenAI
 from datetime import datetime
 import time
 import requests
@@ -18,7 +19,7 @@ warnings.filterwarnings('ignore')
 # 创建一个handler，用于写入日志文件
 logger = logging.getLogger('pywebio')
 logger.setLevel(logging.DEBUG)
-logger_error = logging.FileHandler('pywebio.log')
+logger_error = logging.FileHandler('../pywebio.log')
 logger_error.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger_error.setFormatter(formatter)
@@ -35,42 +36,20 @@ HISTORY = []
 
 
 def do_request(messages=None, *args, **kwargs):
-    api_key = '261152645fcf6e37acf1c0be1d8082dd.nahqDpoCFcp9bpNt'
-    token = jwt.encode(
-        {
-            'api_key': api_key.split('.')[0],
-            'exp': int(round(time.time() * 1000)) + 1000 * 60 * 60,
-            'timestamp': int(round(time.time() * 1000))
-        },
-        api_key.split('.')[1],
-        algorithm='HS256',
-        headers={'alg': 'HS256', 'sign_type': 'SIGN'}
+    api_key = 'sk-KJkVrBU606vu6J2PW9Y3ZEBYU5npa3g833Of0VYjIThUs1BK'
+
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://api.moonshot.cn/v1",
     )
-    data = {'model': 'glm-4', 'messages': messages, 'stream': False, 'temperature': 0.1, 'top_p': 0.1}
-    domain_name = 'https://open.bigmodel.cn'
-    headers = {'Content-Type': 'application/json', 'Authorization': token}
-    proxies = {'http': PROXY, 'https': PROXY}
-    response = requests.post(
-        url=f'{domain_name}/api/paas/v4/async/chat/completions', json=data, headers=headers, proxies=proxies,
-        verify=False
+
+    completion = client.chat.completions.create(
+        model="moonshot-v1-8k",
+        messages=messages,
+        temperature=0.3,
     )
-    res = None
-    if response is not None and response.status_code == 200:
-        retry_count = 60
-        result_url = f"{domain_name}/api/paas/v4/async-result/{response.json()['id']}",
-        while retry_count:
-            # await asyncio.sleep(0.5)
-            time.sleep(1)
-            res2 = requests.get(url=result_url[0], data=None, headers=headers, proxies=proxies, verify=False)
-            if res2.status_code == 200:
-                res_data = res2.json()
-                if res_data['task_status'] == 'SUCCESS':
-                    res = res2.json()['choices'][0]['message']['content']
-                    break
-            retry_count -= 1
-        return res
-    else:
-        return None
+
+    return completion.choices[0].message.content
 
 
 def pin_on_change_(name: str, onchange=None, clear: bool = False, init_run: bool = False, **callback_options):

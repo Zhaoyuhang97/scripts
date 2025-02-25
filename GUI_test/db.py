@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 def init_db():
-    conn = sqlite3.connect('knowledge.db')
+    conn = sqlite3.connect('demo1_knowledge.db')
     c = conn.cursor()
     c.execute('''
     CREATE TABLE IF NOT EXISTS articles

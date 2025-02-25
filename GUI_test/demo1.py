@@ -5,6 +5,8 @@ from db import init_db
 
 import sqlite3
 
+DB_NAME = 'demo1_knowledge.db'
+
 
 class KnowledgeApp(QWidget):
     def __init__(self):
@@ -85,7 +87,7 @@ class KnowledgeApp(QWidget):
     # 数据库操作装饰器
     def db_operation(func):
         def wrapper(self, *args, **kwargs):
-            with sqlite3.connect('knowledge.db') as conn:
+            with sqlite3.connect(DB_NAME) as conn:
                 cursor = conn.cursor()
                 try:
                     return func(self, cursor, *args, **kwargs)
@@ -197,7 +199,7 @@ class KnowledgeApp(QWidget):
         row = self.table.currentRow()
         if row >= 0:
             art_id = self.table.item(row, 0).text()
-            with sqlite3.connect('knowledge.db') as conn:
+            with sqlite3.connect(DB_NAME) as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT content FROM articles WHERE id=?", (art_id,))
                 content = cursor.fetchone()
