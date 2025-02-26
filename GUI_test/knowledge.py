@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (
     QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QHeaderView, QAction,
     QFileDialog, QMessageBox, QLabel, QComboBox, QAbstractItemView, QDialog, QDialogButtonBox, QTextEdit, QToolButton
 )
-from PyQt5.QtGui import QPixmap, QIcon
+from validation import LicenseDialog, LicenseManager
 import sqlite3
 
 DB_NAME = "demo2_knowledge.db"
@@ -15,9 +15,9 @@ class DocumentManager(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("文档管理系统")
-        self.resize(800, 600)
+        self.resize(1000, 800)
         self.current_page = 1
-        self.page_size = 5  # 每页显示的文档数量
+        self.page_size = 10  # 每页显示的文档数量
         self.total_pages = 1  # 总页数
         self.keyword = None
         self.init_db()
@@ -256,6 +256,7 @@ class AddDocumentDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("新增文档")
+        # self.resize(300, 100)
         self.layout = QVBoxLayout(self)
 
         self.name_input = QLineEdit()
@@ -400,7 +401,21 @@ class DetailDocumentDialog(QDialog):
 
 
 if __name__ == "__main__":
+    license_manager = LicenseManager()
     app = QApplication(sys.argv)
-    window = DocumentManager()
-    window.show()
-    sys.exit(app.exec_())
+    # key
+    key_path = "secret.key"
+    # check license
+    if license_manager.validate_license() is False:
+        # file license valid failed
+        license_dialog = LicenseDialog(license_manager, key_path=key_path)
+        if license_dialog.exec_() == QDialog.Accepted:
+            # input license valid success
+            window = DocumentManager()
+            window.show()
+            sys.exit(app.exec_())
+    else:
+        # file license valid success
+        window = DocumentManager()
+        window.show()
+        sys.exit(app.exec_())
