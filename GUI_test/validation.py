@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 from datetime import datetime
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
+from typing import Any
 import os
 
 
@@ -83,75 +83,22 @@ class LicenseDialog(QDialog):
     def validate_license(self):
         """校验License"""
         license_str = self.license_input.text()
-        expire_date = self._validate_license(license_str)
-        if expire_date == 0:
+        expire_date, status = self._validate_license(license_str)
+        if status == 0:
             QMessageBox.critical(self, "校验失败", "License无效！")
-        elif expire_date == 2:
+        elif status == 2:
             QMessageBox.critical(self, "校验失败", "License已过期！")
         else:
             QMessageBox.information(self, "校验成功", f"License有效期至{expire_date.strftime('%Y-%m-%d')}")
             self.accept()
 
-
-    def _validate_license(self, license_str: str):
+    def _validate_license(self, license_str: str) -> tuple[Any, int]:
         if expire_date := self.license_manager.validate_license(license_str):
             if expire_date > datetime.now():
                 with open(r'secret.key', 'w') as f:
                     f.write(license_str)
-                return expire_date
+                return expire_date, 1
             else:
-                return 2
+                return '', 2
         else:
-            return 0
-
-
-class ValidationWindow(QMainWindow):
-    """主窗口"""
-
-    def __init__(self, license_manager):
-        super().__init__()
-        self.license_manager = license_manager
-        self.init_ui()
-
-    def init_ui(self):
-        """初始化界面"""
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-        self.layout = QVBoxLayout(self.central_widget)
-
-        self.label = QLabel("欢迎使用文档管理系统！")
-        self.layout.addWidget(self.label)
-
-        self.doc_manager_button = QPushButton("进入文档管理")
-        self.doc_manager_button.clicked.connect(self.open_document_manager)
-        self.layout.addWidget(self.doc_manager_button)
-
-    def open_document_manager(self):
-        """打开文档管理系统"""
-        # 在这里可以初始化你的文档管理系统
-        QMessageBox.information(self, "提示", "文档管理系统已启动！")
-
-    def check_license(self):
-        """校验License"""
-        license_dialog = LicenseDialog(self.license_manager, self)
-        if license_dialog.exec_() == QDialog.Accepted:
-            return True
-        else:
-            return False
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-
-    # 初始化License管理器
-    license_manager = LicenseManager()
-
-    # 模拟生成一个License（实际使用时应保存密钥和偏移量）
-    expire_date = "2026-12-31"
-    license_str = license_manager.generate_license(expire_date)
-    print(f"Generated License: {license_str}")
-
-    # 启动主窗口
-    window = ValidationWindow(license_manager)
-    window.check_license()
-    sys.exit(app.exec_())
+            return '', 0
