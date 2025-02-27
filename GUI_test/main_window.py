@@ -3,13 +3,16 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget,
     QPushButton, QLabel, QDialog, QSpacerItem, QSizePolicy
 )
-from validation import LicenseDialog, LicenseManager
 from PyQt5.QtCore import Qt
-from settings import DB_NAME
+
 from apps.knowledge import DocumentDialog
+from apps.test_plot import LineChartDialog
 from pathlib import Path
-import sqlite3
+from settings import DB_NAME
+from validation import LicenseDialog, LicenseManager
+
 import os
+import sqlite3
 import sys
 
 
@@ -105,7 +108,7 @@ class MainManager(QMainWindow):
         self.button_layout2.addWidget(self.info_management_button)
 
         # 报表生成按钮
-        self.report_generation_button = QPushButton("报表生成")
+        self.report_generation_button = QPushButton("图表生成")
         self.report_generation_button.clicked.connect(self.open_report_generation)
         self.report_generation_button.setFixedSize(200, 50)
         self.button_layout2.addWidget(self.report_generation_button)
@@ -136,7 +139,7 @@ class MainManager(QMainWindow):
 
     def open_report_generation(self):
         """打开报表生成页面"""
-        self.show_page(DocumentDialog)
+        self.show_page(LineChartDialog)
 
     def show_page(self, dialog):
         """弹出对应的页面"""

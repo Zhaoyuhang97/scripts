@@ -3,3 +3,4 @@ pywebio
 requests
 pyjwt
 openai
+matplotlib
