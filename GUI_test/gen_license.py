@@ -17,10 +17,11 @@ class LicenseManager:
         self.key = key
         self.iv = iv
 
-    def generate_license(self, expire_date):
+    def generate_license(self, secret_data):
         """生成License"""
         cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
-        data = f"expire_date={expire_date}".encode("utf-8")
+        # data = f"expire_date={expire_date}".encode("utf-8")
+        data = str(secret_data).encode("utf-8")
         padded_data = self._pad(data)
         encrypted_data = cipher.encrypt(padded_data)
         return b64encode(encrypted_data).decode("utf-8")
@@ -33,9 +34,9 @@ class LicenseManager:
             decrypted_data = cipher.decrypt(encrypted_data)
             unpadded_data = self._unpad(decrypted_data)
             data = unpadded_data.decode("utf-8")
-            expire_date_str = data.split("=")[1]
-            expire_date = datetime.strptime(expire_date_str, "%Y-%m-%d")
-            return expire_date > datetime.now()
+            # expire_date_str = data.split("=")[1]
+            # expire_date = datetime.strptime(expire_date_str, "%Y-%m-%d")
+            return eval(data)
         except Exception as e:
             print(f"License validation error: {e}")
             return False
@@ -59,6 +60,7 @@ if __name__ == "__main__":
     v = b'adminadminadmina'
     license_manager = LicenseManager(key=v, iv=b'adminadminadmina')
     # 模拟生成一个License（实际使用时应保存密钥和偏移量）
-    expire_date = "2026-12-31"
+    expire_date = {"expire_date": "2026-01-01", "version": '1.0', "title": "license有限期为2029-01-01"}
     license_str = license_manager.generate_license(expire_date)
     print(f"Generated License: {license_str}")
+    license_manager.validate_license(license_str)

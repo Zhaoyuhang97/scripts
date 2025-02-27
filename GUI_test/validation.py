@@ -7,6 +7,7 @@ from datetime import datetime
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 from typing import Any
+from settings import VERSION
 import os
 
 
@@ -17,15 +18,7 @@ class LicenseManager:
         self.key = key
         self.iv = iv
 
-    def generate_license(self, expire_date):
-        """生成License"""
-        cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
-        data = f"expire_date={expire_date}".encode("utf-8")
-        padded_data = self._pad(data)
-        encrypted_data = cipher.encrypt(padded_data)
-        return b64encode(encrypted_data).decode("utf-8")
-
-    def validate_license(self, license_str=None):
+    def validate_license(self, license_str=None) -> dict:
         """校验License"""
         try:
             if license_str is None:
@@ -33,18 +26,20 @@ class LicenseManager:
                     with open('secret.key', 'r') as f:
                         license_str = f.readline()
                 else:
-                    return False
+                    return {}
             encrypted_data = b64decode(license_str)
             cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
             decrypted_data = cipher.decrypt(encrypted_data)
             unpadded_data = self._unpad(decrypted_data)
-            data = unpadded_data.decode("utf-8")
-            expire_date_str = data.split("=")[1]
-            expire_date = datetime.strptime(expire_date_str, "%Y-%m-%d")
-            return expire_date
+            data = eval(unpadded_data.decode("utf-8"))
+            expire_date_str = data.get('expire_date', None)
+            version = data.get('version', None)
+            if datetime.strptime(expire_date_str, "%Y-%m-%d") <= datetime.now() or version != VERSION:
+                return {}
+            return data
         except Exception as e:
             print(f"License validation error: {e}")
-            return False
+            return {}
 
     @staticmethod
     def _pad(data):
@@ -83,22 +78,25 @@ class LicenseDialog(QDialog):
     def validate_license(self):
         """校验License"""
         license_str = self.license_input.text()
-        expire_date, status = self._validate_license(license_str)
+        decode_key, status = self._validate_license(license_str)
         if status == 0:
             QMessageBox.critical(self, "校验失败", "License无效！")
         elif status == 2:
             QMessageBox.critical(self, "校验失败", "License已过期！")
         else:
-            QMessageBox.information(self, "校验成功", f"License有效期至{expire_date.strftime('%Y-%m-%d')}")
+            QMessageBox.information(self, "校验成功", decode_key['title'])
             self.accept()
 
     def _validate_license(self, license_str: str) -> tuple[Any, int]:
-        if expire_date := self.license_manager.validate_license(license_str):
+        decode_key = self.license_manager.validate_license(license_str)
+        expire_date_str = decode_key.get('expire_date', None)
+        if expire_date_str:
+            expire_date = datetime.strptime(expire_date_str, "%Y-%m-%d")
             if expire_date > datetime.now():
                 with open(r'secret.key', 'w') as f:
                     f.write(license_str)
-                return expire_date, 1
+                return decode_key, 1
             else:
-                return '', 2
+                return None, 2
         else:
-            return '', 0
+            return None, 0

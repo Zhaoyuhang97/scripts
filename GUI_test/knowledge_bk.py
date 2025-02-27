@@ -6,12 +6,11 @@ from PyQt5.QtWidgets import (
     QFileDialog, QMessageBox, QLabel, QComboBox, QAbstractItemView, QDialog, QDialogButtonBox, QTextEdit, QToolButton
 )
 from validation import LicenseDialog, LicenseManager
+from settings import DB_NAME
 import sqlite3
 
-DB_NAME = "demo2_knowledge.db"
 
-
-class DocumentManager(QMainWindow):
+class DocumentDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("文档管理系统")
@@ -20,7 +19,7 @@ class DocumentManager(QMainWindow):
         self.page_size = 10  # 每页显示的文档数量
         self.total_pages = 1  # 总页数
         self.keyword = None
-        self.init_db()
+        # self.init_db()
         self.init_ui()
 
     def init_db(self):
@@ -240,7 +239,7 @@ class DocumentManager(QMainWindow):
     def search_documents(self):
         """搜索文档"""
         self.keyword = self.search_input.text().strip()
-        self.keyword = self.keyword  if self.keyword != '' else None
+        self.keyword = self.keyword if self.keyword != '' else None
         self.current_page = 1  # 重置到第一页
         self.load_documents()
 
@@ -406,16 +405,16 @@ if __name__ == "__main__":
     # key
     key_path = "secret.key"
     # check license
-    if license_manager.validate_license() is False:
+    if not license_manager.validate_license():
         # file license valid failed
         license_dialog = LicenseDialog(license_manager, key_path=key_path)
         if license_dialog.exec_() == QDialog.Accepted:
             # input license valid success
-            window = DocumentManager()
+            window = DocumentDialog()
             window.show()
             sys.exit(app.exec_())
     else:
         # file license valid success
-        window = DocumentManager()
+        window = DocumentDialog()
         window.show()
         sys.exit(app.exec_())
