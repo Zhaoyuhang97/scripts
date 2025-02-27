@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLi
                              QHeaderView, QAbstractItemView, QTableWidgetItem, QComboBox, QFileDialog, QMessageBox,
                              QTextEdit, QDialogButtonBox, QWidget)
 from datetime import datetime
-import settings
+from settings import DB_NAME
 import os
 import sqlite3
 
@@ -21,7 +21,7 @@ class DocumentDialog(QDialog):
 
     def init_db(self):
         """初始化数据库"""
-        self.conn = sqlite3.connect(settings.DB_NAME)
+        self.conn = sqlite3.connect(DB_NAME)
         self.cursor = self.conn.cursor()
 
     def init_ui(self):
