@@ -50,25 +50,3 @@ class LineChartDialog(QDialog):
 
         # 重新绘制
         self.canvas.draw()
-
-
-class MainApp(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("主页面")
-        self.resize(800, 600)
-        self.init_ui()
-
-    def init_ui(self):
-        """初始化主页面布局"""
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-        self.layout = QVBoxLayout(self.central_widget)
-
-        self.show_chart_button = QPushButton("显示折线图")
-        self.show_chart_button.clicked.connect(self.show_line_chart)
-        self.layout.addWidget(self.show_chart_button)
-
-    def show_line_chart(self):
-        chart_dialog = LineChartDialog(self)
-        chart_dialog.exec_()

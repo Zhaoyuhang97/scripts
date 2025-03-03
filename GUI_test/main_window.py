@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (
     QPushButton, QLabel, QDialog, QSpacerItem, QSizePolicy
 )
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 
 from apps.knowledge import DocumentDialog
 from apps.test_plot import LineChartDialog
@@ -159,10 +160,12 @@ if __name__ == "__main__":
         if license_dialog.exec_() == QDialog.Accepted:
             # input license valid success
             window = MainManager()
+            window.setWindowIcon(QIcon('images/logo.gif'))
             window.show()
             sys.exit(app.exec_())
     else:
         # file license valid success
         window = MainManager()
+        window.setWindowIcon(QIcon('images/logo.gif'))
         window.show()
         sys.exit(app.exec_())
