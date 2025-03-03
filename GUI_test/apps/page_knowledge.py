@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLi
                              QHeaderView, QAbstractItemView, QTableWidgetItem, QComboBox, QFileDialog, QMessageBox,
                              QTextEdit, QDialogButtonBox, QWidget)
 from datetime import datetime
-from settings import DB_NAME, MEDIA_DIR
+from apps.settings import DB_NAME, MEDIA_DIR
 import os
 import sqlite3
 import shutil
@@ -197,17 +197,22 @@ class DocumentDialog(QDialog):
         dialog = ModifyDocumentDialog(doc_id, doc_name, doc_type, file_path, self)
         if dialog.exec_() == QDialog.Accepted:
             new_name, new_type, new_file_path = dialog.get_data()
-            self.modify_document(row_idx, new_name, new_type, new_file_path)
+            is_file_change = True if file_path != new_file_path else False
+            self.modify_document(row_idx, new_name, new_type, new_file_path, is_file_change)
 
-    def modify_document(self, row_idx, new_name, new_type, new_file_path):
+    def modify_document(self, row_idx, new_name, new_type, new_file_path, is_file_change=True):
         """修改文档信息"""
         doc_id = self.table.item(row_idx, 0).text()
-        base_name = os.path.basename(new_file_path)
-        media_path = gen_filename(base_name)
+
+        if is_file_change is True:
+            base_name = os.path.basename(new_file_path)
+            media_path = gen_filename(base_name)
+            shutil.copyfile(new_file_path, media_path)
+        else:
+            media_path = new_file_path
         self.cursor.execute("""
             UPDATE documents SET name = ?, type = ?, file_path = ? WHERE id = ?
         """, (new_name, new_type, media_path, doc_id))
-        shutil.copyfile(new_file_path, media_path)
         self.conn.commit()
         self.load_documents()
 

@@ -1,17 +1,17 @@
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget,
-    QPushButton, QLabel, QDialog, QSpacerItem, QSizePolicy
+    QPushButton, QLabel, QDialog
 )
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
-from apps.knowledge import DocumentDialog
-from apps.test_plot import LineChartDialog
+from apps.page_knowledge import DocumentDialog
+from apps.page_test_plot import LineChartDialog
+from apps.page_process_bar import LoadingQDialog
 from pathlib import Path
-from settings import DB_NAME
-from validation import LicenseDialog, LicenseManager
+from apps.settings import DB_NAME
+from apps.utils_validation import LicenseDialog, LicenseManager
 
-import os
 import sqlite3
 import sys
 
@@ -96,8 +96,8 @@ class MainManager(QMainWindow):
         self.button_layout1.addWidget(self.doc_management_button)
 
         # 人员管理按钮
-        self.staff_management_button = QPushButton("人员管理")
-        self.staff_management_button.clicked.connect(self.open_staff_management)
+        self.staff_management_button = QPushButton("Loading...")
+        self.staff_management_button.clicked.connect(self.open_loading_management)
         self.staff_management_button.setFixedSize(200, 50)
         self.button_layout1.addWidget(self.staff_management_button)
 
@@ -129,9 +129,9 @@ class MainManager(QMainWindow):
         """打开文档管理页面"""
         self.show_page(DocumentDialog)
 
-    def open_staff_management(self):
-        """打开人员管理页面"""
-        self.show_page(DocumentDialog)
+    def open_loading_management(self):
+        """打开Loading页面"""
+        self.show_page(LoadingQDialog)
 
     def open_info_management(self):
         """打开信息管理页面"""

@@ -1,12 +1,11 @@
 import sys
 import os
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget,
-    QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QHeaderView, QAction,
-    QFileDialog, QMessageBox, QLabel, QComboBox, QAbstractItemView, QDialog, QDialogButtonBox, QTextEdit, QToolButton
+    QApplication, QVBoxLayout, QHBoxLayout, QWidget,
+    QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QHeaderView, QFileDialog, QMessageBox, QLabel, QComboBox, QAbstractItemView, QDialog, QDialogButtonBox, QTextEdit
 )
-from validation import LicenseDialog, LicenseManager
-from settings import DB_NAME
+from apps.utils_validation import LicenseDialog, LicenseManager
+from apps.settings import DB_NAME
 import sqlite3
 
 

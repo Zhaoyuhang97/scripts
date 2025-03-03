@@ -2,12 +2,11 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QPushButton, QMessageBox, QDialog, QLineEdit
 )
-from PyQt5.QtCore import Qt
 from datetime import datetime
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 from typing import Any
-from settings import VERSION
+from .settings import VERSION
 import os
 
 
@@ -22,8 +21,8 @@ class LicenseManager:
         """校验License"""
         try:
             if license_str is None:
-                if os.path.exists('secret.key'):
-                    with open('secret.key', 'r') as f:
+                if os.path.exists('../secret.key'):
+                    with open('../secret.key', 'r') as f:
                         license_str = f.readline()
                 else:
                     return {}
@@ -93,7 +92,7 @@ class LicenseDialog(QDialog):
         if expire_date_str:
             expire_date = datetime.strptime(expire_date_str, "%Y-%m-%d")
             if expire_date > datetime.now():
-                with open(r'secret.key', 'w') as f:
+                with open(r'../secret.key', 'w') as f:
                     f.write(license_str)
                 return decode_key, 1
             else:
