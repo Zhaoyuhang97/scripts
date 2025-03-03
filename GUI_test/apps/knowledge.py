@@ -2,9 +2,17 @@ from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLi
                              QHeaderView, QAbstractItemView, QTableWidgetItem, QComboBox, QFileDialog, QMessageBox,
                              QTextEdit, QDialogButtonBox, QWidget)
 from datetime import datetime
-from settings import DB_NAME
+from settings import DB_NAME, MEDIA_DIR
 import os
 import sqlite3
+import shutil
+
+
+def gen_filename(filename) -> str:
+    media_dir = MEDIA_DIR / 'knowledge'
+    if not media_dir.exists():
+        os.makedirs(media_dir.as_posix(), exist_ok=True)
+    return (media_dir / f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}").as_posix()
 
 
 class DocumentDialog(QDialog):
@@ -170,9 +178,12 @@ class DocumentDialog(QDialog):
     def add_document(self, name, type_, file_path):
         """添加文档到数据库"""
         create_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        base_name = os.path.basename(file_path)
+        media_path = gen_filename(base_name)
         self.cursor.execute("""
             INSERT INTO documents (name, type, create_time, file_path) VALUES (?, ?, ?, ?)
-        """, (name, type_, create_time, file_path))
+        """, (name, type_, create_time, media_path))
+        shutil.copyfile(file_path, media_path)
         self.conn.commit()
         self.keyword = None
         self.last_page()
@@ -191,9 +202,12 @@ class DocumentDialog(QDialog):
     def modify_document(self, row_idx, new_name, new_type, new_file_path):
         """修改文档信息"""
         doc_id = self.table.item(row_idx, 0).text()
+        base_name = os.path.basename(new_file_path)
+        media_path = gen_filename(base_name)
         self.cursor.execute("""
             UPDATE documents SET name = ?, type = ?, file_path = ? WHERE id = ?
-        """, (new_name, new_type, new_file_path, doc_id))
+        """, (new_name, new_type, media_path, doc_id))
+        shutil.copyfile(new_file_path, media_path)
         self.conn.commit()
         self.load_documents()
 
