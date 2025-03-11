@@ -67,5 +67,8 @@ global_css += """
     body {
         background: #f5f5f7 !important;
     }
+    .container {
+        max-width: 80%;
+    }
 </style>
 """

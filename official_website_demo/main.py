@@ -1,10 +1,13 @@
+import tornado
 from pywebio import start_server, config
 from pywebio.output import *
 from pywebio.session import run_js
+from pywebio.platform.tornado import webio_handler
 
 from official_website_demo.components import nav_bar, footer
 from official_website_demo.global_css import global_css
 from official_website_demo.pages import home_page
+from official_website_demo.settings import BASE_DIR
 
 
 def model_detail_page(model_name):
@@ -25,7 +28,8 @@ def model_detail_page(model_name):
 
         put_row([
             put_column([
-                put_image(f"https://search-operate.cdn.bcebos.com/7e85570b817e17e8f3ae93134cc78451.gif", format='jpeg').style(
+                put_image(f"https://search-operate.cdn.bcebos.com/7e85570b817e17e8f3ae93134cc78451.gif",
+                          format='jpeg').style(
                     "width: 100%; border-radius: 12px;")
             ], size="1fr"),
             put_column([
@@ -88,7 +92,21 @@ def main():
     home_page()  # 主页
     footer()  # 页脚
     put_html(global_css)
+    put_html("""<script type="text/javascript" src="/static/js/pywebio.min.js"></script>""")
 
 
-if __name__ == '__main__':
-    start_server(main, port=8080, debug=True)
+def make_app():
+    return tornado.web.Application([
+        (r"/", webio_handler(main)),
+        # 配置静态文件路径
+        # (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": static_path.as_posix()}),
+    ])
+
+
+if __name__ == "__main__":
+    app = make_app()
+    app.listen(8080)
+    static_path = BASE_DIR / 'staticfiles'
+    app.settings = {"static_path": static_path.as_posix()}
+    tornado.ioloop.IOLoop.current().start()
+    # start_server(main, port=8080, debug=True, static_dir='./staticfiles')
