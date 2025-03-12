@@ -1,8 +1,14 @@
 from .home import home_page
-from .all_models import all_models_page
+from .all_models import models_page
+from .technology import technology_page
+from .service import service_page
+from .news import news_page
 
 
 __all__ = [
     'home_page',
-    'all_models_page',
+    'models_page',
+    'technology_page',
+    'service_page',
+    'news_page',
 ]

@@ -6,7 +6,7 @@ from pywebio.platform.tornado import webio_handler
 
 from official_website_demo.components import nav_bar, footer
 from official_website_demo.global_css import global_css
-from official_website_demo.pages import home_page
+from official_website_demo.pages import home_page, models_page, technology_page, service_page, news_page
 from official_website_demo.settings import BASE_DIR
 
 
@@ -58,46 +58,41 @@ def model_detail_page(model_name):
     put_button("返回首页", onclick=lambda: home_page())
 
 
-def technology_page():
-    clear()
-    nav_bar()
-    put_scope("main_content")
-    with use_scope("main_content"):
-        put_row([
-            put_text("核心技术").style("font-size: 2rem;")
-        ])
-        put_grid([
-            [put_column([
-                put_text("智能驾驶").style("font-size: 1.5rem; margin-bottom: 1rem;"),
-                put_text("全栈自研的自动驾驶系统，配备12个摄像头和5个毫米波雷达").style("color: #666;")
-            ], size="1fr"),
-                put_column([
-                    put_text("电池技术").style("font-size: 1.5rem; margin-bottom: 1rem;"),
-                    put_text("自主研发的固态电池技术，能量密度提升40%").style("color: #666;")
-                ], size="1fr"),
-                put_column([
-                    put_text("智能座舱").style("font-size: 1.5rem; margin-bottom: 1rem;"),
-                    put_text("全场景语音交互，多屏联动智能生态系统").style("color: #666;")
-                ], size="1fr")]
-        ], cell_width='1fr')
-    footer()
-    put_button("返回首页", onclick=lambda: home_page())
-
-
-def main():
+def main(page):
     config(title="EV Motors 官网", css_style=global_css)
     clear()
     nav_bar()  # 页头
     put_scope("main_content")
-    home_page()  # 主页
+    page()  # 主页
     footer()  # 页脚
     put_html(global_css)
     put_html("""<script type="text/javascript" src="/static/js/pywebio.min.js"></script>""")
 
 
+def home():
+    main(home_page)
+
+def models():
+    main(models_page)
+
+def technology():
+    main(technology_page)
+
+def service():
+    main(service_page)
+
+def news():
+    main(news_page)
+
+
 def make_app():
     return tornado.web.Application([
-        (r"/", webio_handler(main)),
+        (r"/", webio_handler(home)),
+        (r"/home", webio_handler(home)),
+        (r"/models", webio_handler(models)),
+        (r"/technology", webio_handler(technology)),
+        (r"/service", webio_handler(service)),
+        (r"/news", webio_handler(news)),
         # 配置静态文件路径
         # (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": static_path.as_posix()}),
     ])

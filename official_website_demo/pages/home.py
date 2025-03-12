@@ -2,7 +2,6 @@ from pywebio import start_server, config
 from pywebio.output import *
 from pywebio.session import run_js
 from official_website_demo.settings import BASE_DIR, TOAST_ERROR_MSG
-from official_website_demo.pages.all_models import all_models_page
 
 
 def technology_page():
@@ -44,7 +43,7 @@ def home_page():
             put_column([
                 put_text("未来，此刻启程").style("font-size: 4rem; margin-bottom: 1rem;"),
                 put_text("体验新一代智能电动汽车").style("font-size: 1.5rem; margin-bottom: 2rem;"),
-                put_button("探索车型", onclick=all_models_page).style(
+                put_button("探索车型", onclick=lambda: run_js("window.location.href = '/models';")).style(
                     "padding: 1rem 2rem; background: none; border: none; color: white;"
                     "border-radius: 20px; cursor: pointer; font-size: 1rem; transition: background 0.3s ease;"
                 )
@@ -65,7 +64,7 @@ def home_page():
                     put_text(model['desc']).style("text-align: center; color: #666; margin: 0.5rem 0;"),
                     put_text(model['price']).style("text-align: center; font-weight: bold; margin-bottom: 1rem;"),
                     put_button("了解更多", onclick=lambda: toast(model['name'])).style(
-                        "margin-top: 1rem; border: none; color: #0071e3; padding: 0.5rem 1.5rem; border-radius: 20px; cursor: pointer;"
+                        "margin-top: 1rem; border: none; color: #0071e3; padding: 0.5rem 0.5rem; border-radius: 20px; cursor: pointer;"
                     )
                 ], size="auto").style("padding: 1rem;text-align: center;")
             ], size='1.3').style("border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);margin-right: 1rem;")

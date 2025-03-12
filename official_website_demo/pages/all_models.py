@@ -61,10 +61,9 @@ def all_models_card(data):
                         put_text(model['desc']).style("text-align: center; color: #666; margin: 0.5rem 0;"),
                         put_text(model['price']).style("text-align: center; font-weight: bold; margin-bottom: 1rem;"),
                         put_button("了解更多", onclick=lambda: toast(model['name'])).style(
-                            "margin-top: 1rem; border: none; color: #0071e3; padding: 0.5rem 1.5rem; border-radius: 20px; cursor: pointer;"
+                            "margin-top: 1rem; border: none; color: #0071e3; padding: 0.5rem 0.5rem; border-radius: 20px; cursor: pointer;"
                         )
-                    ]).style(
-                        "padding: 1rem;text-align: center;")
+                    ], size='20% 20% 20% 40%').style("padding: 1rem;text-align: center;")
                 ], size='1fr').style(
                     "border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: 1rem;")
                 row_content.append(item)  # 整行
@@ -92,7 +91,7 @@ def all_models_card(data):
                 """)
 
 
-def all_models_page():
+def models_page():
     scope = 'main_content'
     clear(scope)
     data = get_data()
@@ -146,12 +145,13 @@ def all_models_page():
 
         put_row(
             [
+                put_text(''),
                 put_input(name='search', label='', placeholder='搜索关键词').style('margin: 0;'),
                 put_button('搜索', color='info', outline=False, onclick=search_handler),
                 # put_html(f'''<div class="icon"></div>''').onclick(lambda x:x),
                 # put_image(src=f"data:image/png;base64, {icon}").style('margin-right: 20%;'),
-            ], size='80% 10%'
-        ).style('margin: 20px auto;position: relative; width: 50%;')
+            ], size='8% 80% 15%'
+        ).style('margin: 0 auto;position: relative; width: 50%; margin-bottom: 3vh')
         # pin_on_change('search', search_handler)
         put_scope('main_content_modal_cards')
         all_models_card(data)
