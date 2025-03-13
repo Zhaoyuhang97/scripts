@@ -6,8 +6,7 @@ image = BASE_DIR / 'staticfiles' / 'image'
 
 def news_page():
     scope = 'main_content'
-    clear(scope)
-    with use_scope(scope):
+    with use_scope(scope, clear=True):
         style = """
             :root {
                 --apple-dark: #1d1d1f;

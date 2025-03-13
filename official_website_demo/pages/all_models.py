@@ -3,6 +3,7 @@ from pywebio.pin import put_input
 from official_website_demo.settings import BASE_DIR
 from pywebio.output import *
 from pywebio.pin import pin, pin_on_change
+from pywebio.session import run_js
 
 import base64
 import math
@@ -38,7 +39,7 @@ def search_handler():
 
 
 def all_models_card(data):
-    with use_scope('main_content_modal_cards'):
+    with use_scope('main_content_modal_cards', clear=True):
         if not data:
             return
         items_per_row = 5  # 每行显示5个元素
@@ -60,7 +61,8 @@ def all_models_card(data):
                         put_text(model['name']).style("text-align: center; font-size: 1.5rem; margin-bottom: 0.5rem;"),
                         put_text(model['desc']).style("text-align: center; color: #666; margin: 0.5rem 0;"),
                         put_text(model['price']).style("text-align: center; font-weight: bold; margin-bottom: 1rem;"),
-                        put_button("了解更多", onclick=lambda: toast(model['name'])).style(
+                        put_button("了解更多", onclick=lambda: run_js(
+                            f"window.location.href = '/model-detail/{model['name']}';")).style(
                             "margin-top: 1rem; border: none; color: #0071e3; padding: 0.5rem 0.5rem; border-radius: 20px; cursor: pointer;"
                         )
                     ], size='20% 20% 20% 40%').style("padding: 1rem;text-align: center;")

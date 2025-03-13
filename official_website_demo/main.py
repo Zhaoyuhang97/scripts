@@ -6,7 +6,7 @@ from pywebio.platform.tornado import webio_handler
 
 from official_website_demo.components import nav_bar, footer
 from official_website_demo.global_css import global_css
-from official_website_demo.pages import home_page, models_page, technology_page, service_page, news_page
+from official_website_demo.pages import home_page, models_page, technology_page, service_page, news_page, model_detail
 from official_website_demo.settings import BASE_DIR
 
 
@@ -72,17 +72,25 @@ def main(page):
 def home():
     main(home_page)
 
+
 def models():
     main(models_page)
+
 
 def technology():
     main(technology_page)
 
+
 def service():
     main(service_page)
 
+
 def news():
     main(news_page)
+
+
+def detail():
+    main(model_detail)
 
 
 def make_app():
@@ -93,6 +101,8 @@ def make_app():
         (r"/technology", webio_handler(technology)),
         (r"/service", webio_handler(service)),
         (r"/news", webio_handler(news)),
+        # (r"/about-us", webio_handler(news)),
+        (r"/model-detail/(.*)", webio_handler(detail)),
         # 配置静态文件路径
         # (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": static_path.as_posix()}),
     ])

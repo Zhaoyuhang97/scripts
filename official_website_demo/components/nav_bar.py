@@ -14,7 +14,6 @@ def nav_bar():
                 put_text('技术').onclick(lambda: run_js("window.location.href = '/technology';")),
                 put_text('服务').onclick(lambda: run_js("window.location.href = '/service';")),
                 put_text('新闻').onclick(lambda: run_js("window.location.href = '/news';")),
-                put_text('关于我们').onclick(lambda: run_js("window.location.href = '/models';")),
             ], size="auto").style("display: flex; gap: 2rem;color: #78c2ad;")
         ], size='1fr').style("backdrop-filter: blur(10px); padding: 1rem 2rem;align-items: center;height: 8vh; margin-bottom: 3vh")
 

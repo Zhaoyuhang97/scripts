@@ -26,7 +26,6 @@ def show_page(page_name, model_name=None):
 
 def home_page():
     scope = 'main_content'
-    clear(scope)
     models = [
         {"name": "EM7", "desc": "旗舰轿跑", "price": "¥268,000起",
          "img": open((BASE_DIR / 'media' / 'images' / '2.png').as_posix(), 'rb').read()},
@@ -38,7 +37,7 @@ def home_page():
     if not models:
         toast(TOAST_ERROR_MSG, color='error')
         return None
-    with use_scope(scope):  # 在 "main_content" 作用域中渲染内容
+    with use_scope(scope, clear=True):  # 在 "main_content" 作用域中渲染内容
         put_row([
             put_column([
                 put_text("未来，此刻启程").style("font-size: 4rem; margin-bottom: 1rem;"),
@@ -63,7 +62,7 @@ def home_page():
                     put_text(model['name']).style("text-align: center; font-size: 1.5rem; margin-bottom: 0.5rem;"),
                     put_text(model['desc']).style("text-align: center; color: #666; margin: 0.5rem 0;"),
                     put_text(model['price']).style("text-align: center; font-weight: bold; margin-bottom: 1rem;"),
-                    put_button("了解更多", onclick=lambda: toast(model['name'])).style(
+                    put_button("了解更多", onclick=lambda: run_js(f"window.location.href = '/model-detail/{model['name']}';")).style(
                         "margin-top: 1rem; border: none; color: #0071e3; padding: 0.5rem 0.5rem; border-radius: 20px; cursor: pointer;"
                     )
                 ], size="auto").style("padding: 1rem;text-align: center;")

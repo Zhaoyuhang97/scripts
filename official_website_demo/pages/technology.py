@@ -6,8 +6,7 @@ image = BASE_DIR / 'staticfiles' / 'image'
 
 def technology_page():
     scope = 'main_content'
-    clear(scope)
-    with use_scope(scope):
+    with use_scope(scope, clear=True):
         style = """
             <style>
                 @import url('https://cdn.jsdelivr.net/npm/@apple-oss/sf-font@1.0.0/sf-font.css');

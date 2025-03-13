@@ -28,10 +28,9 @@ def create_module(title, desc, specs):
 
 def service_page():
     scope = 'main_content'
-    clear(scope)
-    icon1 = base64.b64encode(
-        open((BASE_DIR / 'staticfiles' / 'icon' / 'customer-feedback.png').as_posix(), 'rb').read()).decode()
-    with use_scope(scope):
+    # icon1 = base64.b64encode(
+    #     open((BASE_DIR / 'staticfiles' / 'icon' / 'customer-feedback.png').as_posix(), 'rb').read()).decode()
+    with use_scope(scope, clear=True):
         put_html(
             """
             <style>
