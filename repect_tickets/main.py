@@ -10,7 +10,7 @@ if torch.cuda.is_available():
     device = 'cuda'  # 输出True表示CUDA可用
 else:
     device = 'cpu'
-with open('stop_words', 'r') as f:
+with open('stop_words', 'r', encoding='utf-8') as f:
     stop_words = f.read().split('\n')
 text2vec_model = SentenceModel('text2vec-bge-large-chinese', device=device)
 
@@ -46,6 +46,7 @@ def process_data(df):
     # df_['desc'] = df_['short_description'] + df_['desc']
 
     df_['desc'] = df_['desc'].apply(desc_delete_id)
+    df_['desc'] = df_['short_description'].str.lower() + df_['desc']
     # 日期
     df_['create_date'] = pd.to_datetime(df_['create_time']).dt.date
     return df_
@@ -94,3 +95,4 @@ if __name__ == '__main__':
     df_process = process_data(df_data)
     df_final = df_process.groupby(['creator_id', 'create_date']).progress_apply(compare).reset_index(drop=True)
     df_final.to_excel(f'result_{datetime.now().strftime("%Y%m%d%H%M%S")}.xlsx', index=False)
+    print('Completed.')
