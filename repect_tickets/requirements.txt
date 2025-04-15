@@ -1,0 +1,4 @@
+pandas
+scikit-learn
+text2vec
+pytorch
