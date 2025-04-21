@@ -36,9 +36,9 @@ class ProcessData:
 
     def process_incident(self):
         file_path = os.path.join(self.file_dir, self.incident_filename)
-        l1_caller_is_valid_field = '无效(L1 Caller)py'
-        resolution_code_is_valid_field = '无效(Resolution code)py'
-        contact_type_is_valid_field = '无效(Contact Type)py'
+        l1_caller_is_valid_field = '无效(L1 Caller)'
+        resolution_code_is_valid_field = '无效(Resolution code)'
+        contact_type_is_valid_field = '无效(Contact Type)'
         if not os.path.exists(file_path):
             return pd.DataFrame()
         else:
@@ -94,17 +94,17 @@ class ProcessData:
 
     def process_interaction(self):
         file_path = os.path.join(self.file_dir, self.interaction_filename)
-        l1_caller_is_valid_field = '无效(L1 Caller)py'
-        contact_type_is_valid_field = '无效(Contact Type)py'
-        closed_abandoned_is_valid_field = '无效(State非"Closed Abandoned")py'
-        short_description_is_valid_field = '无效(ShortDescription不包含"[#]")py'
-        state_reason_is_valid_field = '无效(Abn Reason非Wrong Number、User Abandoned、Junk Email、Insufficient Information to Progress)py'
-        caller_is_valid_field = '无效(Caller 非K账号)py'
+        l1_caller_is_valid_field = '无效(L1 Caller)'
+        contact_type_is_valid_field = '无效(Contact Type)'
+        closed_abandoned_is_valid_field = '无效(State非"Closed Abandoned")'
+        short_description_is_valid_field = '无效(ShortDescription不包含"[#]")'
+        state_reason_is_valid_field = '无效(Abn Reason非Wrong Number、User Abandoned、Junk Email、Insufficient Information to Progress)'
+        caller_is_valid_field = '无效(Caller 非K账号)'
         if not os.path.exists(file_path):
             return pd.DataFrame()
         else:
             df = pd.read_excel(file_path)
-            df.rename(columns={'Type': 'Contact type', 'User ID': 'PRID',
+            df.rename(columns={'Type': 'Contact type', 'User ID': 'PRID', 'State Reason': 'Call type(非技术类型)',
                                'Manager': 'Caller Manager', 'Manager.1': 'Opened by Manager'}, inplace=True)
             # L1 Caller(无效条件)
             df[l1_caller_is_valid_field] = (
@@ -159,11 +159,11 @@ class ProcessData:
             # 输出
             if self.output:
                 df.to_excel(os.path.join(self.output_file_dir, os.path.basename(file_path)), index=False)
-            df['all'] = df[[l1_caller_is_valid_field, contact_type_is_valid_field, closed_abandoned_is_valid_field,
-                            short_description_is_valid_field, state_reason_is_valid_field, caller_is_valid_field]].sum(
-                axis=1)
-            df.drop(index=df[(df[closed_abandoned_is_valid_field] == 1) & (df['all'] == 1)].index, inplace=True)
-            df.drop(columns=[closed_abandoned_is_valid_field, 'all'], inplace=True)
+            # df['all'] = df[[l1_caller_is_valid_field, contact_type_is_valid_field, closed_abandoned_is_valid_field,
+            #                 short_description_is_valid_field, state_reason_is_valid_field, caller_is_valid_field]].sum(
+            #     axis=1)
+            df.drop(index=df[df[closed_abandoned_is_valid_field] == 1].index, inplace=True)
+            df.drop(columns=[closed_abandoned_is_valid_field], inplace=True)
             # 无效的原因(删除closed_abandoned_is_valid_field列所以output在前)
             conditions = [
                 df[l1_caller_is_valid_field] == 1,
@@ -185,14 +185,14 @@ class ProcessData:
                 default=''
             )  # 添加'a'列，根据'b', 'c', 'd'列的值来设置内容
 
-        return df.drop(columns=['State Reason', l1_caller_is_valid_field, contact_type_is_valid_field,
+        return df.drop(columns=[l1_caller_is_valid_field, contact_type_is_valid_field,
                                 short_description_is_valid_field, state_reason_is_valid_field,
                                 caller_is_valid_field]).reset_index(drop=True)
 
     def process_request(self):
         file_path = os.path.join(self.file_dir, self.request_filename)
-        l1_caller_is_valid_field = '无效(L1 Caller)py'
-        contact_type_is_valid_field = '无效(Contact Type)py'
+        l1_caller_is_valid_field = '无效(L1 Caller)'
+        contact_type_is_valid_field = '无效(Contact Type)'
         if not os.path.exists(file_path):
             return pd.DataFrame()
         else:
@@ -237,7 +237,7 @@ class ProcessData:
 
     def process_d2d_incident(self):
         file_path = os.path.join(self.file_dir, self.d2d_incident_filename)
-        follow_up_l1_is_valid_field = '无效(D2D Followup SD L1开单)py'
+        follow_up_l1_is_valid_field = '无效(D2D Followup SD L1开单)'
         if not os.path.exists(file_path):
             return pd.DataFrame()
         else:
@@ -273,7 +273,7 @@ class ProcessData:
 
     def process_d2d_request(self):
         file_path = os.path.join(self.file_dir, self.d2d_request_filename)
-        follow_up_l1_is_valid_field = '无效(D2D Followup SD L1开单)py'
+        follow_up_l1_is_valid_field = '无效(D2D Followup SD L1开单)'
         if not os.path.exists(file_path):
             return pd.DataFrame()
         else:
@@ -320,13 +320,13 @@ def process_data(df):
     df_ = df.copy()
     df_['desc'] = df_['Short description'].str.lower()
     # 日期
-    df_['Opened'] = pd.to_datetime(df_['Opened']).dt.date
+    df_['Opened_date'] = pd.to_datetime(df_['Opened']).dt.date
     return df_
 
 
 def compare(df_simple):
     if df_simple.shape[0] == 1:
-        df_simple['result'] = ''
+        df_simple['result'] = '-'
         return df_simple
     dd = df_simple.reset_index(drop=True)
 
@@ -354,9 +354,10 @@ def run():
     df_data_valid = df_data[df_data['是否有效'] == 1].reset_index(drop=True)
     df_data_invalid = df_data[df_data['是否有效'] == 0].reset_index(drop=True)
     df_process = process_data(df_data_valid)
-    df_result = df_process.groupby(['PRID', 'Opened']).progress_apply(compare).reset_index(drop=True)
+    df_result = df_process.groupby(['PRID', 'Opened_date']).progress_apply(compare).reset_index(drop=True)
     df_final = pd.concat([df_result, df_data_invalid]).reset_index(drop=True)
-    df_final.to_excel(f'output/result_{datetime.now().strftime("%Y%m%d%H%M%S")}.xlsx', index=False)
+    df_final.drop(columns=['desc', 'Opened_date']).to_excel(
+        f'output/result_{datetime.now().strftime("%Y%m%d%H%M%S")}.xlsx', index=False)
 
 
 if __name__ == '__main__':
