@@ -349,7 +349,9 @@ def compare(df_simple):
     return df_simple
 
 
-def run():
+def run(output='output'):
+    if not os.path.exists(output):
+        os.mkdir(output)
     df_data = ProcessData().get_dataframe()
     df_data_valid = df_data[df_data['是否有效'] == 1].reset_index(drop=True)
     df_data_invalid = df_data[df_data['是否有效'] == 0].reset_index(drop=True)
@@ -357,7 +359,7 @@ def run():
     df_result = df_process.groupby(['PRID', 'Opened_date']).progress_apply(compare).reset_index(drop=True)
     df_final = pd.concat([df_result, df_data_invalid]).reset_index(drop=True)
     df_final.drop(columns=['desc', 'Opened_date']).to_excel(
-        f'output/result_{datetime.now().strftime("%Y%m%d%H%M%S")}.xlsx', index=False)
+        f'{output}/result_{datetime.now().strftime("%Y%m%d%H%M%S")}.xlsx', index=False)
 
 
 if __name__ == '__main__':
