@@ -137,7 +137,7 @@ class ProcessData:
             df[state_reason_is_valid_field] = 0
             df.loc[
                 df[
-                    ~df['State Reason'].str.lower().str.strip().isin(
+                    ~df['Call type(非技术类型)'].str.lower().str.strip().isin(
                         ['wrong number', 'user abandoned', 'junk email', 'insufficient information to progress']
                     )
                 ].index,
@@ -361,8 +361,12 @@ def run():
 
 
 if __name__ == '__main__':
-    print(f"开始: {datetime.now()}")
-    tqdm.pandas(desc="Processing texts")  # 设置进度条描述
-    run()
-    print(f"完成: {datetime.now()}")
-    input('输入任意键关闭...')
+    try:
+        print(f"开始: {datetime.now()}")
+        tqdm.pandas(desc="Processing texts")  # 设置进度条描述
+        run()
+        print(f"完成: {datetime.now()}")
+    except Exception as e:
+        print(repr(e))
+    finally:
+        input('输入任意键关闭...')
