@@ -90,6 +90,7 @@ class ProcessData:
             # 输出
             if self.output:
                 df.to_excel(os.path.join(self.output_file_dir, os.path.basename(file_path)), index=False)
+                print(f'{os.path.basename(file_path)}结果已生成！')
         return df.drop(columns=[contact_type_is_valid_field, resolution_code_is_valid_field, l1_caller_is_valid_field])
 
     def process_interaction(self):
@@ -159,6 +160,7 @@ class ProcessData:
             # 输出
             if self.output:
                 df.to_excel(os.path.join(self.output_file_dir, os.path.basename(file_path)), index=False)
+                print(f'{os.path.basename(file_path)}结果已生成！')
             # df['all'] = df[[l1_caller_is_valid_field, contact_type_is_valid_field, closed_abandoned_is_valid_field,
             #                 short_description_is_valid_field, state_reason_is_valid_field, caller_is_valid_field]].sum(
             #     axis=1)
@@ -233,6 +235,7 @@ class ProcessData:
             # 输出
             if self.output:
                 df.to_excel(os.path.join(self.output_file_dir, os.path.basename(file_path)), index=False)
+                print(f'{os.path.basename(file_path)}结果已生成！')
         return df.drop(columns=['State', contact_type_is_valid_field, l1_caller_is_valid_field])
 
     def process_d2d_incident(self):
@@ -269,6 +272,7 @@ class ProcessData:
             # 输出
             if self.output:
                 df.to_excel(os.path.join(self.output_file_dir, os.path.basename(file_path)), index=False)
+                print(f'{os.path.basename(file_path)}结果已生成！')
         return df.drop(columns=[follow_up_l1_is_valid_field])
 
     def process_d2d_request(self):
@@ -305,6 +309,7 @@ class ProcessData:
             # 输出
             if self.output:
                 df.to_excel(os.path.join(self.output_file_dir, os.path.basename(file_path)), index=False)
+                print(f'{os.path.basename(file_path)}结果已生成！')
         return df.drop(columns=[follow_up_l1_is_valid_field])
 
     def get_dataframe(self):
@@ -326,7 +331,9 @@ def process_data(df):
 
 def compare(df_simple):
     if df_simple.shape[0] == 1:
-        df_simple['result'] = '-'
+        df_simple['相似工单号'] = '-'
+        df_simple['相似工单short_description'] = '-'
+        df_simple['相似工单score'] = '-'
         return df_simple
     dd = df_simple.reset_index(drop=True)
 
@@ -336,16 +343,22 @@ def compare(df_simple):
     np.fill_diagonal(similarity, -1)  # 自己的相似度置为-1
     # 每行按照数值从大到小排列，返回索引
     sorted_indices = np.argsort(-similarity, axis=1)
-    sorted_sim = []
+    sim_ticket = []
+    sim_short_desc = []
+    sim_score = []
     # 打印结果
     for i, row_indices in enumerate(sorted_indices):
         aa = []
         for j in row_indices:
             value = similarity[i, j]
             if value != -1:
-                aa.append(f"{dd.loc[j, 'Number']}:{str(round(value, 4))}")
-        sorted_sim.append(' '.join(aa))
-    df_simple['result'] = sorted_sim
+                aa.append([dd.loc[j, 'Number'], str(round(value, 4))])
+        sim_ticket.append(aa[0][0])
+        sim_short_desc.append(dd[dd['Number'] == aa[0][0]]['Short description'].tolist()[0])
+        sim_score.append(aa[0][1])
+    df_simple['相似工单号'] = sim_ticket
+    df_simple['相似工单short_description'] = sim_short_desc
+    df_simple['相似工单score'] = sim_score
     return df_simple
 
 

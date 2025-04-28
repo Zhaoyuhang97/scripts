@@ -1,5 +1,5 @@
 
-modelscope download --model lili666/text2vec-bge-large-chinese README.md --local_dir ./text2vec-bge-large-chinese
+modelscope download --model lili666/text2vec-bge-large-chinese --local_dir ./text2vec-bge-large-chinese
 ## 打包
 > pyinstaller main_2.py -D -i repeat.png
 > 

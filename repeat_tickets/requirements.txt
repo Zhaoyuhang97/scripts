@@ -2,3 +2,4 @@ pandas
 scikit-learn
 text2vec
 torch
+openpyxl
